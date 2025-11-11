@@ -1,0 +1,273 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>RedNight — Account</title>
+    <style>
+        :root {
+            --bg: #070607;
+            --panel: #0f0d0f;
+            --accent1: #ff1f1f;
+            --accent2: #b30000;
+            --muted: #9b9b9b;
+            --radius: 12px;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            font-family: "Inter", system-ui, -apple-system, "Segoe UI", Arial;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(180deg, #050505 0%, #0c0c0c 40%, #120707 100%);
+            color: #eee;
+            padding: 24px;
+        }
+
+        .wrap {
+            max-width: 980px;
+            margin: 0 auto
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .logo {
+            height: 48px;
+            width: 48px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            font-family: monospace;
+            box-shadow: 0 6px 18px rgba(179, 0, 0, 0.18);
+        }
+
+        .site-title {
+            font-size: 20px;
+            font-weight: 700;
+            letter-spacing: 0.6px
+        }
+
+        .small {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        .nav a {
+            color: #f3dcdc;
+            text-decoration: none;
+            margin-left: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-size: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .nav a:hover {
+            background: rgba(255, 31, 31, 0.12);
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+            border-radius: var(--radius);
+            padding: 18px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        h2 {
+            margin-top: 0
+        }
+
+        .row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 18px;
+        }
+
+        .panel {
+            flex: 1 1 260px;
+            background: rgba(0, 0, 0, 0.24);
+            border-radius: 10px;
+            padding: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .label {
+            font-size: 12px;
+            color: var(--muted);
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.07em
+        }
+
+        .value {
+            font-size: 15px;
+            font-weight: 600
+        }
+
+        .cart-list {
+            max-height: 220px;
+            overflow-y: auto;
+            padding-right: 6px;
+            margin-top: 6px;
+            font-size: 13px;
+        }
+
+        .cart-item {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .cart-item:last-child {
+            border-bottom: none
+        }
+
+        .empty {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px
+        }
+
+        footer {
+            margin-top: 18px;
+            text-align: center;
+            font-size: 12px;
+            color: var(--muted);
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header class="header">
+            <div class="brand">
+                <div class="logo">RN</div>
+                <div>
+                    <div class="site-title">RedNight Account</div>
+                    <div class="small">Manage your demo profile & cart</div>
+                </div>
+            </div>
+            <nav class="nav">
+                <!-- case-sensitive targets, exactly as you asked -->
+                <a href="main.html">Home</a>
+                <a href="shop.html">Shop</a>
+                <a href="main.html#cartBox">Checkout</a>
+                <a href="About.html">About</a>
+                <a href="account.html" target="login.html">Account</a>
+                <a href="rank.html" target="login.html">Ranks</a>
+                <a href="chalenge.html" target="login.html">Challenges</a>
+                <a href="leaderboard.html" target="login.html">Leaderboard</a>
+                <a href="account.html" target="login.html">Account</a>
+                <a href="account.html" target="login.html">Account</a>
+                <a href="shop.html">Shop</a>
+            </nav>
+        </header>
+
+        <main class="card">
+            <h2>Account Overview</h2>
+            <div class="small" id="loginStateMsg"></div>
+
+            <div class="row" style="margin-top:14px">
+                <section class="panel">
+                    <div class="label">Current user</div>
+                    <div class="value" id="currentUserValue">—</div>
+
+                    <div style="margin-top:10px">
+                        <div class="label">Password (masked)</div>
+                        <div class="value" id="maskedPassValue">********</div>
+                    </div>
+                </section>
+
+                <section class="panel">
+                    <div class="label">Cart items</div>
+                    <div class="cart-list" id="cartList"></div>
+                </section>
+            </div>
+        </main>
+
+        <footer>
+            Demo only: credentials & cart are stored in this browser using localStorage.
+        </footer>
+    </div>
+
+    <script>
+        const CART_KEY = "rn_demo_cart_v1";
+
+        function getUsers() {
+            try { return JSON.parse(localStorage.getItem("users") || "{}"); }
+            catch (e) { return {}; }
+        }
+        function getCurrentUser() {
+            return localStorage.getItem("currentUser") || null;
+        }
+        function getCart() {
+            try { return JSON.parse(localStorage.getItem(CART_KEY) || "[]"); }
+            catch (e) { return []; }
+        }
+
+        function maskPassword(p) {
+            if (!p) return "********";
+            const first = p.slice(0, 3);
+            const restLen = Math.max(0, p.length - 3);
+            return first + "*".repeat(restLen);
+        }
+
+        function renderAccount() {
+            const users = getUsers();
+            const user = getCurrentUser();
+            const loginState = document.getElementById("loginStateMsg");
+            const userEl = document.getElementById("currentUserValue");
+            const passEl = document.getElementById("maskedPassValue");
+            const cartEl = document.getElementById("cartList");
+
+            if (!user) {
+                loginState.textContent = "No user is currently logged in. Please log in on the login page first.";
+                userEl.textContent = "—";
+                passEl.textContent = "********";
+            } else {
+                loginState.textContent = "You are logged in as: " + user;
+                userEl.textContent = user;
+
+                const pass = users[user] || "";
+                passEl.textContent = maskPassword(pass);
+            }
+
+            const cart = getCart();
+            cartEl.innerHTML = "";
+            if (!cart.length) {
+                cartEl.innerHTML = '<div class="empty">Cart is currently empty.</div>';
+            } else {
+                cart.forEach((id, idx) => {
+                    const div = document.createElement("div");
+                    div.className = "cart-item";
+                    div.textContent = (idx + 1) + ". Item ID: " + id;
+                    cartEl.appendChild(div);
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", renderAccount);
+    </script>
+</body>
+
+</html>

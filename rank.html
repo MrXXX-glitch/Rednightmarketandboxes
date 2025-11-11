@@ -1,0 +1,425 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>RedNight — Ranks</title>
+    <style>
+        :root {
+            --bg: #0b0013;
+            --panel: #120022;
+            --accent: #9c27ff;
+            --accent2: #ff00d4;
+            --text: #eae0ff;
+            --muted: #b8a6d9;
+            --radius: 14px;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(circle at top, #140026 0%, #050008 100%);
+            color: var(--text);
+            padding: 30px;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 0 25px rgba(156, 39, 255, 0.3);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 20px;
+            color: #fff;
+            text-shadow: 0 0 10px #fff;
+            letter-spacing: 1px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 16px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: 0.2s;
+        }
+
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            color: #e4c8ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 12px var(--accent2);
+        }
+
+        .small {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 26px;
+        }
+
+        #xpDisplay {
+            text-align: center;
+            font-weight: 700;
+            color: var(--accent2);
+            margin-bottom: 8px;
+        }
+
+        .panel {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.25));
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 18px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+            margin-bottom: 24px;
+        }
+
+        /* Progress bar */
+        .progress-wrap {
+            margin-top: 10px;
+            font-size: 13px;
+            color: var(--muted);
+        }
+
+        .progress-outer {
+            width: 100%;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 999px;
+            overflow: hidden;
+            margin-top: 6px;
+        }
+
+        .progress-inner {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            box-shadow: 0 0 16px rgba(156, 39, 255, 0.7);
+            transition: width 0.4s ease;
+        }
+
+        /* Rank list */
+        .rank-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 16px;
+            margin-top: 12px;
+        }
+
+        .rank-card {
+            background: radial-gradient(circle at top left, rgba(156, 39, 255, 0.3), rgba(0, 0, 0, 0.8));
+            border-radius: var(--radius);
+            padding: 14px 14px 12px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .rank-card.current {
+            box-shadow: 0 0 25px rgba(255, 0, 212, 0.7);
+            border-color: var(--accent2);
+        }
+
+        .rank-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 4px;
+            color: #fff;
+        }
+
+        .rank-xp {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 6px;
+        }
+
+        .rank-unlock {
+            font-size: 13px;
+            color: #f2e8ff;
+        }
+
+        .tag {
+            position: absolute;
+            top: 8px;
+            right: 10px;
+            padding: 3px 8px;
+            border-radius: 999px;
+            font-size: 11px;
+            background: rgba(0, 0, 0, 0.5);
+            color: var(--accent2);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .cat-btn {
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            color: white;
+            font-weight: 700;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 0 12px rgba(156, 39, 255, 0.3);
+            font-size: 13px;
+        }
+
+        .cat-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 20px rgba(255, 0, 212, 0.5);
+        }
+
+        .top-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 10px;
+            margin-top: 6px;
+            flex-wrap: wrap;
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">RedNight 🏆 Ranks</div>
+        <nav>
+            <a href="main.html">Home</a>
+            <a href="chalenge.html">Challenges</a>
+            <a href="rank.html">Ranks</a>
+            <a href="account.html">Account</a>
+            <a href="account.html" target="login.html">Account</a>
+            <a href="leaderboard.html" target="login.html">Leaderboard</a>
+            <a href="account.html" target="login.html">Account</a>
+            <a href="account.html" target="login.html">Account</a>
+            <a href="about.html" target="about.html">About</a>
+            <a href="shop.html">Shop</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>RedNight Rank System</h1>
+        <div id="xpDisplay">XP: 0</div>
+        <div class="small">
+            Earn XP by solving challenges and exploring the RedNight universe.<br>
+            Your rank unlocks new areas, hints, and bragging rights.
+        </div>
+
+        <section class="panel">
+            <div class="top-actions">
+                <div>
+                    <strong id="currentRankLabel">Current rank:</strong>
+                    <span id="currentRankName">Unranked</span>
+                </div>
+                <button class="cat-btn" onclick="resetXP()">Reset XP (demo)</button>
+            </div>
+
+            <div class="progress-wrap">
+                <span id="progressText">Progress to next rank: 0%</span>
+                <div class="progress-outer">
+                    <div class="progress-inner" id="progressBar"></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel">
+            <h2 style="margin:0 0 6px 0;">Rank ladder</h2>
+            <div class="small">Each level has an XP requirement and unlocks extra perks.</div>
+
+            <div class="rank-list" id="rankList"></div>
+        </section>
+    </main>
+
+    <footer>
+        XP and ranks are stored locally in your browser. Later you can sync them to a global leaderboard.
+    </footer>
+
+    <script>
+        // Same XP storage used in challenges.html
+        let xp = parseInt(localStorage.getItem("userXP") || "0", 10);
+
+        // Define rank ladder
+        const RANKS = [
+            {
+                name: "New Recruit",
+                min: 0,
+                max: 49,
+                unlock: "Basic access to RedNight challenges and resources."
+            },
+            {
+                name: "Script Runner",
+                min: 50,
+                max: 149,
+                unlock: "Unlock extra Recon hints and simple automation tips."
+            },
+            {
+                name: "Log Watcher",
+                min: 150,
+                max: 299,
+                unlock: "Unlock beginner Forensics tasks and log analysis notes."
+            },
+            {
+                name: "Packet Sniffer",
+                min: 300,
+                max: 499,
+                unlock: "Wireshark tips and network challenge hints become available."
+            },
+            {
+                name: "Web Exploiter",
+                min: 500,
+                max: 799,
+                unlock: "Unlock advanced Web challenges and OWASP cheat sheets."
+            },
+            {
+                name: "Crypto Analyst",
+                min: 800,
+                max: 1199,
+                unlock: "Advanced Crypto puzzles and challenge hints unlocked."
+            },
+            {
+                name: "Blue Team Sentinel",
+                min: 1200,
+                max: 1699,
+                unlock: "Defensive playbooks, IR templates, and blue-team labs."
+            },
+            {
+                name: "Red Team Specialist",
+                min: 1700,
+                max: 2499,
+                unlock: "Red-team style simulations and stealth challenges."
+            },
+            {
+                name: "Cyber Architect",
+                min: 2500,
+                max: 3499,
+                unlock: "Full-lab scenarios and multi-step attack paths unlocked."
+            },
+            {
+                name: "RedNight Legend",
+                min: 3500,
+                max: Infinity,
+                unlock: "All content unlocked. You see everything the platform can offer."
+            }
+        ];
+
+        const xpDisplay = document.getElementById("xpDisplay");
+        const currentRankNameEl = document.getElementById("currentRankName");
+        const progressText = document.getElementById("progressText");
+        const progressBar = document.getElementById("progressBar");
+        const rankListEl = document.getElementById("rankList");
+
+        function updateXPDisplay() {
+            xpDisplay.textContent = "XP: " + xp;
+        }
+
+        function getCurrentRank(xpValue) {
+            return RANKS.find(r => xpValue >= r.min && xpValue <= r.max);
+        }
+
+        function getNextRank(current) {
+            const idx = RANKS.indexOf(current);
+            if (idx === -1 || idx === RANKS.length - 1) return null;
+            return RANKS[idx + 1];
+        }
+
+        function renderRanks() {
+            rankListEl.innerHTML = "";
+            const curRank = getCurrentRank(xp);
+            RANKS.forEach((r, idx) => {
+                const card = document.createElement("div");
+                card.className = "rank-card";
+                if (curRank && curRank.name === r.name) {
+                    card.classList.add("current");
+                    const tag = document.createElement("div");
+                    tag.className = "tag";
+                    tag.textContent = "Current";
+                    card.appendChild(tag);
+                }
+
+                const maxLabel = r.max === Infinity ? "∞" : r.max;
+
+                card.innerHTML += `
+          <div class="rank-name">${idx + 1}. ${r.name}</div>
+          <div class="rank-xp">XP needed: ${r.min} – ${maxLabel}</div>
+          <div class="rank-unlock">${r.unlock}</div>
+        `;
+                rankListEl.appendChild(card);
+            });
+
+            if (curRank) {
+                currentRankNameEl.textContent = curRank.name;
+            } else {
+                currentRankNameEl.textContent = "Unranked";
+            }
+
+            updateProgress(curRank);
+        }
+
+        function updateProgress(curRank) {
+            if (!curRank) {
+                progressText.textContent = "Progress to next rank: 0%";
+                progressBar.style.width = "0%";
+                return;
+            }
+
+            const next = getNextRank(curRank);
+            if (!next) {
+                progressText.textContent = "Max rank reached! 🎉";
+                progressBar.style.width = "100%";
+                return;
+            }
+
+            const span = next.min - curRank.min;
+            const done = xp - curRank.min;
+            const pct = Math.max(0, Math.min(100, Math.floor((done / span) * 100)));
+            progressText.textContent = `Progress to next rank (${next.name}): ${pct}%`;
+            progressBar.style.width = pct + "%";
+        }
+
+        function resetXP() {
+            if (!confirm("Reset your XP to 0? (Demo only)")) return;
+            xp = 0;
+            localStorage.setItem("userXP", "0");
+            updateXPDisplay();
+            renderRanks();
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            updateXPDisplay();
+            renderRanks();
+        });
+    </script>
+</body>
+
+</html>

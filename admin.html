@@ -1,0 +1,456 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>RedNight — Admin</title>
+    <style>
+        :root {
+            --bg: #070607;
+            --panel: #0f0d0f;
+            --accent1: #ff1f1f;
+            --accent2: #b30000;
+            --muted: #9b9b9b;
+            --radius: 10px;
+            --card-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial;
+        }
+
+        * {
+            box-sizing: border-box
+        }
+
+        body {
+            margin: 0;
+            background: linear-gradient(180deg, #050505 0%, #0c0c0c 40%, #120707 100%);
+            color: #eee;
+            padding: 26px;
+        }
+
+        .wrap {
+            max-width: 1100px;
+            margin: 0 auto
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 18px;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .logo {
+            height: 48px;
+            width: 48px;
+            border-radius: 10px;
+            background: linear-gradient(135deg, var(--accent1), var(--accent2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 800;
+            color: white;
+            font-family: monospace;
+        }
+
+        .site-title {
+            font-size: 18px;
+            font-weight: 700
+        }
+
+        .nav a {
+            color: #f3dcdc;
+            text-decoration: none;
+            margin-left: 12px;
+            padding: 6px 10px;
+            border-radius: 8px;
+        }
+
+        .nav a:hover {
+            background: rgba(255, 31, 31, 0.12);
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+            border-radius: var(--radius);
+            padding: 16px;
+            box-shadow: var(--card-shadow);
+            border: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        h2 {
+            margin: 0 0 8px 0
+        }
+
+        h3 {
+            margin: 0 0 6px 0;
+            font-size: 15px
+        }
+
+        .small {
+            font-size: 13px;
+            color: var(--muted)
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12px
+        }
+
+        th,
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px dashed rgba(255, 255, 255, 0.04);
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            color: var(--muted);
+            font-weight: 600;
+            font-size: 13px
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            padding: 7px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            background: transparent;
+            color: #fff;
+            width: 100%;
+            font-size: 13px;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .btn {
+            display: inline-block;
+            padding: 7px 12px;
+            border-radius: 8px;
+            background: linear-gradient(90deg, var(--accent1), var(--accent2));
+            color: white;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .btn.ghost {
+            background: transparent;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .btn.danger {
+            background: #c02a2a;
+        }
+
+        .controls {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin-top: 10px;
+            flex-wrap: wrap
+        }
+
+        .notice {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(255, 31, 31, 0.06);
+            color: #ffcfcf;
+            font-size: 13px;
+        }
+
+        .created {
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header class="header">
+            <div class="brand">
+                <div class="logo">RN</div>
+                <div>
+                    <div class="site-title">RedNight — Admin Console</div>
+                    <div class="small">Managing email-based accounts stored in this browser.</div>
+                </div>
+            </div>
+            <nav class="nav">
+                <a href="index.html">Home</a>
+                <a href="shop.html">Shop</a>
+                <a href="index.html#cartBox">Checkout</a>
+                <a href="About.html">About</a>
+            </nav>
+        </header>
+
+        <main class="card">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                <div>
+                    <h2>Email Accounts</h2>
+                    <div class="small">
+                        Showing users from <code>localStorage.emailUsers</code>. Passwords are stored as SHA-256 hashes.
+                    </div>
+                </div>
+                <div class="controls">
+                    <button id="refreshBtn" class="btn ghost">Refresh</button>
+                </div>
+            </div>
+
+            <div style="margin-top:12px;overflow:auto">
+                <table id="usersTable" aria-live="polite">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Email</th>
+                            <th>New password (optional)</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+
+            <div style="margin-top:14px">
+                <h3>Create new account</h3>
+                <div style="display:grid;grid-template-columns:2fr 1fr;gap:8px;max-width:620px">
+                    <input id="newEmail" type="email" placeholder="user@example.com" />
+                    <input id="newPass" type="password" placeholder="password (min 6 chars)" />
+                </div>
+                <div class="controls">
+                    <button id="createBtn" class="btn">Create user</button>
+                    <button id="wipeBtn" class="btn danger">Delete all users</button>
+                </div>
+                <div id="createMsg" class="small" style="margin-top:6px"></div>
+            </div>
+
+            <div class="notice">
+                Demo only: accounts and password hashes live in <code>localStorage</code> on this device.
+                You can change emails and reset passwords here, but you cannot see the original password.
+            </div>
+        </main>
+
+        <footer style="margin-top:18px;color:var(--muted);font-size:13px;text-align:center">
+            For real authentication, use a server, hashed passwords in a database, and proper access control.
+        </footer>
+    </div>
+
+    <script>
+        // Keys must match your login page
+        const EMAIL_USERS_KEY = "emailUsers";       // { email: { passwordHash, createdAt } }
+        const CURRENT_EMAIL_KEY = "currentUserEmail"; // currently logged in email (optional)
+
+        function getEmailUsers() {
+            try { return JSON.parse(localStorage.getItem(EMAIL_USERS_KEY) || "{}"); }
+            catch (e) { return {}; }
+        }
+        function setEmailUsers(obj) {
+            localStorage.setItem(EMAIL_USERS_KEY, JSON.stringify(obj));
+        }
+
+        function getCurrentEmail() {
+            return localStorage.getItem(CURRENT_EMAIL_KEY) || null;
+        }
+
+        // Same SHA-256 hashing style as login page
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const buf = await crypto.subtle.digest("SHA-256", data);
+            const bytes = Array.from(new Uint8Array(buf));
+            return bytes.map(b => b.toString(16).padStart(2, "0")).join("");
+        }
+
+        const usersTableBody = document.querySelector("#usersTable tbody");
+        const refreshBtn = document.getElementById("refreshBtn");
+        const createBtn = document.getElementById("createBtn");
+        const wipeBtn = document.getElementById("wipeBtn");
+        const newEmailInput = document.getElementById("newEmail");
+        const newPassInput = document.getElementById("newPass");
+        const createMsg = document.getElementById("createMsg");
+
+        function formatDate(str) {
+            if (!str) return "—";
+            const d = new Date(str);
+            if (isNaN(d.getTime())) return str;
+            return d.toLocaleString();
+        }
+
+        function loadAndRenderUsers() {
+            const users = getEmailUsers();
+            usersTableBody.innerHTML = "";
+            const emails = Object.keys(users);
+            if (!emails.length) {
+                const r = document.createElement("tr");
+                r.innerHTML = `<td colspan="5" class="small">No email users found in localStorage.emailUsers.</td>`;
+                usersTableBody.appendChild(r);
+                return;
+            }
+
+            emails.forEach((email, idx) => {
+                const info = users[email] || {};
+                const created = info.createdAt || "";
+                const tr = document.createElement("tr");
+
+                tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td><input type="email" class="edit-email" value="${email}"></td>
+        <td><input type="password" class="edit-pass" placeholder="leave blank to keep current"></td>
+        <td class="created">${formatDate(created)}</td>
+        <td style="white-space:nowrap">
+          <button class="btn saveBtn">Save</button>
+          <button class="btn ghost deleteBtn">Delete</button>
+        </td>
+      `;
+
+                usersTableBody.appendChild(tr);
+
+                const saveBtn = tr.querySelector(".saveBtn");
+                const deleteBtn = tr.querySelector(".deleteBtn");
+                const emailInput = tr.querySelector(".edit-email");
+                const passInput = tr.querySelector(".edit-pass");
+
+                saveBtn.addEventListener("click", async () => {
+                    await saveUserEdit(email, emailInput.value.trim().toLowerCase(), passInput.value);
+                    passInput.value = ""; // clear after save
+                });
+
+                deleteBtn.addEventListener("click", () => deleteUser(email));
+            });
+        }
+
+        async function saveUserEdit(originalEmail, newEmail, newPlainPass) {
+            if (!newEmail) {
+                alert("Email cannot be empty.");
+                return;
+            }
+            if (!newEmail.includes("@") || !newEmail.includes(".")) {
+                alert("Please enter a valid email.");
+                return;
+            }
+
+            const users = getEmailUsers();
+            const existingUser = users[originalEmail];
+            if (!existingUser) {
+                alert("Original user not found (maybe already deleted).");
+                loadAndRenderUsers();
+                return;
+            }
+
+            // Renaming email
+            if (newEmail !== originalEmail) {
+                if (users[newEmail]) {
+                    alert("Another account already uses that email.");
+                    return;
+                }
+                users[newEmail] = { ...existingUser }; // copy old data
+                delete users[originalEmail];
+
+                // if logged in as old email, update current email too
+                const cur = getCurrentEmail();
+                if (cur === originalEmail) {
+                    localStorage.setItem(CURRENT_EMAIL_KEY, newEmail);
+                }
+            }
+
+            // Update password if newPlainPass provided
+            if (newPlainPass && newPlainPass.length > 0) {
+                if (newPlainPass.length < 3) {
+                    alert("New password must be at least 6 characters.");
+                    return;
+                }
+                const hash = await hashPassword(newPlainPass);
+                users[newEmail].passwordHash = hash;
+                // keep createdAt
+            }
+
+            setEmailUsers(users);
+            loadAndRenderUsers();
+            alert("User saved.");
+        }
+
+        function deleteUser(email) {
+            if (!confirm(`Delete user "${email}"? This cannot be undone.`)) return;
+            const users = getEmailUsers();
+            if (users[email]) {
+                delete users[email];
+                setEmailUsers(users);
+                // If deleted user is logged in, clear session
+                if (getCurrentEmail() === email) {
+                    localStorage.removeItem(CURRENT_EMAIL_KEY);
+                }
+                loadAndRenderUsers();
+            }
+        }
+
+        createBtn.addEventListener("click", async () => {
+            createMsg.textContent = "";
+            createMsg.style.color = "#ffcfcf";
+
+            const email = newEmailInput.value.trim().toLowerCase();
+            const pass = newPassInput.value;
+
+            if (!email || !pass) {
+                createMsg.textContent = "Email and password are required.";
+                return;
+            }
+            if (!email.includes("@") || !email.includes(".")) {
+                createMsg.textContent = "Please enter a valid email.";
+                return;
+            }
+            if (pass.length < 6) {
+                createMsg.textContent = "Password must be at least 6 characters.";
+                return;
+            }
+
+            const users = getEmailUsers();
+            if (users[email]) {
+                createMsg.textContent = "That email already has an account.";
+                return;
+            }
+
+            const hash = await hashPassword(pass);
+            users[email] = {
+                passwordHash: hash,
+                createdAt: new Date().toISOString()
+            };
+            setEmailUsers(users);
+
+            createMsg.textContent = "User created.";
+            createMsg.style.color = "#9ef29e";
+            newEmailInput.value = "";
+            newPassInput.value = "";
+            loadAndRenderUsers();
+        });
+
+        wipeBtn.addEventListener("click", () => {
+            if (!confirm("Delete ALL email users from localStorage.emailUsers? This cannot be undone.")) return;
+            localStorage.removeItem(EMAIL_USERS_KEY);
+            localStorage.removeItem(CURRENT_EMAIL_KEY);
+            loadAndRenderUsers();
+            alert("All email users deleted.");
+        });
+
+        refreshBtn.addEventListener("click", loadAndRenderUsers);
+
+        document.addEventListener("DOMContentLoaded", loadAndRenderUsers);
+    </script>
+</body>
+
+</html>

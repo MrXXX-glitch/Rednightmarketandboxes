@@ -1,0 +1,489 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>RedNight — Leaderboard</title>
+    <style>
+        :root {
+            --bg: #0b0013;
+            --panel: #120022;
+            --accent: #9c27ff;
+            --accent2: #ff00d4;
+            --text: #eae0ff;
+            --muted: #b8a6d9;
+            --radius: 14px;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(circle at top, #140026 0%, #050008 100%);
+            color: var(--text);
+            padding: 30px 16px 40px;
+            min-height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            padding: 12px 20px;
+            border-radius: 10px;
+            margin: 0 auto 30px;
+            max-width: 1000px;
+            box-shadow: 0 0 25px rgba(156, 39, 255, 0.3);
+        }
+
+        .logo {
+            font-weight: 800;
+            font-size: 20px;
+            color: #fff;
+            text-shadow: 0 0 10px #fff;
+            letter-spacing: 1px;
+        }
+
+        nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 16px;
+            font-weight: 600;
+            padding: 6px 12px;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            transition: 0.2s;
+        }
+
+        nav a:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        main {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            color: #e4c8ff;
+            margin-bottom: 6px;
+            text-shadow: 0 0 12px var(--accent2);
+        }
+
+        .small {
+            text-align: center;
+            color: var(--muted);
+            margin-bottom: 20px;
+            font-size: 13px;
+        }
+
+        #currentUserInfo {
+            text-align: center;
+            font-size: 13px;
+            color: var(--accent2);
+            margin-bottom: 10px;
+        }
+
+        /* Podium layout */
+        .podium-wrapper {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 16px;
+            margin: 20px 0 22px;
+        }
+
+        .podium-col {
+            flex: 0 0 25%;
+            max-width: 200px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            position: relative;
+        }
+
+        .podium-name {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .podium-xp {
+            font-size: 13px;
+            color: var(--muted);
+            margin-bottom: 4px;
+        }
+
+        .podium-rank-label {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3px;
+        }
+
+        .podium-block {
+            width: 100%;
+            border-radius: 10px 10px 0 0;
+            background: radial-gradient(circle at top left, rgba(156, 39, 255, 0.7), rgba(0, 0, 0, 0.85));
+            box-shadow: 0 0 25px rgba(156, 39, 255, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            font-weight: 800;
+            color: #fff;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .podium-block span {
+            position: relative;
+            z-index: 1;
+        }
+
+        .podium-block::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), transparent);
+            mix-blend-mode: screen;
+            opacity: 0.7;
+        }
+
+        /* Different heights */
+        .podium-1 .podium-block {
+            height: 140px;
+        }
+
+        .podium-2 .podium-block {
+            height: 110px;
+        }
+
+        .podium-3 .podium-block {
+            height: 90px;
+        }
+
+        .podium-1 .podium-block {
+            background: radial-gradient(circle at top, rgba(255, 255, 255, 0.5), rgba(156, 39, 255, 0.9));
+        }
+
+        .podium-2 .podium-block {
+            background: radial-gradient(circle at top, rgba(200, 200, 255, 0.3), rgba(120, 120, 220, 0.9));
+        }
+
+        .podium-3 .podium-block {
+            background: radial-gradient(circle at top, rgba(255, 200, 150, 0.3), rgba(180, 120, 60, 0.9));
+        }
+
+        /* "Others" list */
+        .panel {
+            background: linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(0, 0, 0, 0.25));
+            border-radius: var(--radius);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 16px 18px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .panel h2 {
+            margin: 0 0 6px 0;
+            font-size: 16px;
+            color: #f3ddff;
+        }
+
+        #othersList {
+            max-height: 260px;
+            overflow-y: auto;
+            margin-top: 8px;
+            padding-right: 4px;
+        }
+
+        .other-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            font-size: 13px;
+        }
+
+        .other-row:last-child {
+            border-bottom: none;
+        }
+
+        .other-left {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .other-rank {
+            width: 22px;
+            text-align: right;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .other-name {
+            font-weight: 500;
+        }
+
+        .other-xp {
+            color: var(--accent);
+            font-weight: 600;
+        }
+
+        .chip {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 999px;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--muted);
+        }
+
+        .empty {
+            font-size: 13px;
+            color: var(--muted);
+            margin-top: 4px;
+        }
+
+        .cat-btn {
+            background: linear-gradient(90deg, var(--accent), var(--accent2));
+            color: white;
+            font-weight: 700;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 999px;
+            cursor: pointer;
+            transition: 0.2s;
+            box-shadow: 0 0 12px rgba(156, 39, 255, 0.3);
+            font-size: 13px;
+        }
+
+        .cat-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 20px rgba(255, 0, 212, 0.5);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 24px;
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        @media (max-width: 720px) {
+            .podium-wrapper {
+                gap: 10px;
+            }
+
+            .podium-col {
+                flex: 0 0 30%;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <header>
+        <div class="logo">RedNight 🏆 Leaderboard</div>
+        <nav class="nav">
+            <a href="account.html" target="login.html">Account</a>
+            <a href="rank.html" target="login.html">Ranks</a>
+            <a href="chalenge.html" target="login.html">Challenges</a>
+            <a href="leaderboard.html" target="leaderboard.html">Leaderboard</a>
+            <a href="out.html" > Sign out</a>
+            <a href="account.html" target="login.html">Account</a>
+            <a href="about.html" target="about.html">About</a>
+            <a href="shop.html">Shop</a>
+            <a href="#" class="btn ghost"
+                onclick="document.getElementById('cartBox').scrollIntoView({behavior:'smooth'});return false;">Checkout</a>
+        </nav>
+    </header>
+
+    <main>
+        <h1>Global XP Leaderboard</h1>
+        <div id="currentUserInfo"></div>
+        <div class="small">
+            Top 3 claim the podium. Everyone else fights their way up from the list below.<br>
+            XP is earned by solving challenges and activities in the RedNight universe.
+        </div>
+
+        <!-- Podium -->
+        <section class="panel" id="podiumPanel">
+            <div class="podium-wrapper" id="podiumWrapper">
+                <!-- Filled by JS -->
+            </div>
+            <div class="small" id="noDataMsg" style="display:none;">No users with XP yet. Start solving challenges to
+                appear on the board.</div>
+        </section>
+
+        <!-- Others -->
+        <section class="panel" style="margin-top:18px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;">
+                <h2>Challengers</h2>
+                <button class="cat-btn" id="syncBtn">Sync my XP to leaderboard</button>
+            </div>
+            <div class="small">Positions 4 and below appear here in a scrollable list.</div>
+            <div id="othersList"></div>
+        </section>
+    </main>
+
+    <footer>
+        Leaderboard data is stored locally in this browser via <code>localStorage</code>.
+        For a real shared leaderboard you’d sync to a backend or database.
+    </footer>
+
+    <script>
+        const EMAIL_USERS_KEY = "emailUsers";      // { email: { passwordHash, createdAt } }
+        const XP_MAP_KEY = "userXPMap";       // { email: xp }
+        const CURRENT_EMAIL_KEY = "currentUserEmail";
+        const USER_XP_KEY = "userXP";          // global XP from challenges.html
+
+        function getEmailUsers() {
+            try { return JSON.parse(localStorage.getItem(EMAIL_USERS_KEY) || "{}"); }
+            catch (e) { return {}; }
+        }
+
+        function getXpMap() {
+            try { return JSON.parse(localStorage.getItem(XP_MAP_KEY) || "{}"); }
+            catch (e) { return {}; }
+        }
+
+        function setXpMap(map) {
+            localStorage.setItem(XP_MAP_KEY, JSON.stringify(map));
+        }
+
+        function getCurrentEmail() {
+            return localStorage.getItem(CURRENT_EMAIL_KEY) || null;
+        }
+
+        function getCurrentUserXP() {
+            return parseInt(localStorage.getItem(USER_XP_KEY) || "0", 10);
+        }
+
+        function shortNameFromEmail(email) {
+            if (!email) return "Unknown";
+            const at = email.indexOf("@");
+            if (at === -1) return email;
+            return email.slice(0, at);
+        }
+
+        function syncCurrentUserXP() {
+            const email = getCurrentEmail();
+            const xp = getCurrentUserXP();
+            if (!email) return;
+            const map = getXpMap();
+            // Only update if higher XP (basic "best-so-far")
+            map[email] = Math.max(xp, map[email] || 0);
+            setXpMap(map);
+        }
+
+        function buildLeaderboard() {
+            const users = getEmailUsers();
+            const xpMap = getXpMap();
+            const entries = [];
+
+            Object.keys(users).forEach(email => {
+                const xp = xpMap[email] || 0;
+                entries.push({ email, xp });
+            });
+
+            entries.sort((a, b) => b.xp - a.xp);
+
+            const podiumWrapper = document.getElementById("podiumWrapper");
+            const othersList = document.getElementById("othersList");
+            const noDataMsg = document.getElementById("noDataMsg");
+
+            podiumWrapper.innerHTML = "";
+            othersList.innerHTML = "";
+
+            if (!entries.length) {
+                noDataMsg.style.display = "block";
+                return;
+            } else {
+                noDataMsg.style.display = "none";
+            }
+
+            const top3 = entries.slice(0, 3);
+            const rest = entries.slice(3);
+
+            // build podium order: [2nd, 1st, 3rd]
+            const podiumSlots = [
+                { place: 2, data: top3[1], className: "podium-2" },
+                { place: 1, data: top3[0], className: "podium-1" },
+                { place: 3, data: top3[2], className: "podium-3" }
+            ];
+
+            podiumSlots.forEach(slot => {
+                if (!slot.data) {
+                    // If no data for this slot, skip
+                    return;
+                }
+                const col = document.createElement("div");
+                col.className = "podium-col " + slot.className;
+
+                col.innerHTML = `
+          <div class="podium-rank-label">#${slot.place}</div>
+          <div class="podium-name">${shortNameFromEmail(slot.data.email)}</div>
+          <div class="podium-xp">${slot.data.xp} XP</div>
+          <div class="podium-block"><span>${slot.place}</span></div>
+        `;
+
+                podiumWrapper.appendChild(col);
+            });
+
+            // Others list
+            if (!rest.length) {
+                const div = document.createElement("div");
+                div.className = "empty";
+                div.textContent = "No additional challengers yet.";
+                othersList.appendChild(div);
+            } else {
+                rest.forEach((entry, idx) => {
+                    const row = document.createElement("div");
+                    row.className = "other-row";
+                    const rankNumber = idx + 4; // because we're in positions 4+
+
+                    row.innerHTML = `
+            <div class="other-left">
+              <div class="other-rank">#${rankNumber}</div>
+              <div class="other-name">${shortNameFromEmail(entry.email)}</div>
+              <span class="chip">${entry.email}</span>
+            </div>
+            <div class="other-xp">${entry.xp} XP</div>
+          `;
+                    othersList.appendChild(row);
+                });
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            const curEmail = getCurrentEmail();
+            const infoEl = document.getElementById("currentUserInfo");
+            if (curEmail) {
+                infoEl.textContent = `You are logged in as ${curEmail} — your XP will appear here once synced from challenges.`;
+            } else {
+                infoEl.textContent = "Not logged in — solve challenges and log in so your XP can be tracked.";
+            }
+
+            // auto-sync once on load
+            syncCurrentUserXP();
+            buildLeaderboard();
+
+            document.getElementById("syncBtn").addEventListener("click", () => {
+                syncCurrentUserXP();
+                buildLeaderboard();
+            });
+        });
+    </script>
+</body>
+
+</html>

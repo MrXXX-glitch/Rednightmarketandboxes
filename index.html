@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>RedNight — Sign In</title>
+    <style>
+        body {
+            font-family: "Inter", system-ui, sans-serif;
+            background: linear-gradient(135deg, #007bff, #00b4d8);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .card {
+            background: #fff;
+            color: #222;
+            border-radius: 10px;
+            padding: 30px;
+            width: 320px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            text-align: center;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+            color: #007bff;
+        }
+
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 6px 0;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        button {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            padding: 10px;
+            width: 100%;
+            font-size: 15px;
+            margin-top: 10px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #0056d2;
+        }
+
+        .link {
+            font-size: 13px;
+            margin-top: 10px;
+            display: block;
+            color: #007bff;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .error {
+            color: red;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+
+        .success {
+            color: green;
+            font-size: 13px;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- LOGIN -->
+    <div class="card" id="loginCard">
+        <h1>RedNight</h1>
+        <h3>Login</h3>
+        <input id="loginEmail" type="email" placeholder="Email" />
+        <input id="loginPass" type="password" placeholder="Password" />
+        <button onclick="login()">Login</button>
+        <span class="link" onclick="showRegister()">Create account</span>
+        <div id="loginMsg"></div>
+    </div>
+
+    <!-- REGISTER -->
+    <div class="card" id="registerCard" style="display:none;">
+        <h1>Register</h1>
+        <input id="regEmail" type="email" placeholder="Enter email" />
+        <input id="regPass" type="password" placeholder="Choose password" />
+        <input id="regPass2" type="password" placeholder="Repeat password" />
+        <button onclick="register()">Register</button>
+        <span class="link" onclick="showLogin()">Back to login</span>
+        <div id="regMsg"></div>
+    </div>
+
+    <script>
+        // keys in localStorage
+        const EMAIL_USERS_KEY = "emailUsers";       // { email: { passwordHash, createdAt } }
+        const CURRENT_EMAIL_KEY = "currentUserEmail";
+
+        function showRegister() {
+            document.getElementById('loginCard').style.display = 'none';
+            document.getElementById('registerCard').style.display = 'block';
+        }
+        function showLogin() {
+            document.getElementById('registerCard').style.display = 'none';
+            document.getElementById('loginCard').style.display = 'block';
+        }
+
+        function getEmailUsers() {
+            try {
+                return JSON.parse(localStorage.getItem(EMAIL_USERS_KEY) || "{}");
+            } catch (e) {
+                return {};
+            }
+        }
+
+        function setEmailUsers(obj) {
+            localStorage.setItem(EMAIL_USERS_KEY, JSON.stringify(obj));
+        }
+
+        // Hash password using Web Crypto API (SHA-256)
+        async function hashPassword(password) {
+            const encoder = new TextEncoder();
+            const data = encoder.encode(password);
+            const buf = await crypto.subtle.digest("SHA-256", data);
+            const bytes = Array.from(new Uint8Array(buf));
+            return bytes.map(b => b.toString(16).padStart(2, "0")).join("");
+        }
+
+        async function register() {
+            const email = document.getElementById('regEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('regPass').value;
+            const pass2 = document.getElementById('regPass2').value;
+            const msg = document.getElementById('regMsg');
+
+            msg.textContent = "";
+            msg.className = "";
+
+            if (!email || !pass || !pass2) {
+                msg.textContent = "All fields are required.";
+                msg.className = "error";
+                return;
+            }
+
+            if (pass.length < 4) {
+                msg.textContent = "Password must be at least 6 characters.";
+                msg.className = "error";
+                return;
+            }
+
+            if (pass !== pass2) {
+                msg.textContent = "Passwords do not match.";
+                msg.className = "error";
+                return;
+            }
+
+            const existing = getEmailUsers();
+            if (existing[email]) {
+                msg.textContent = "An account with this email already exists.";
+                msg.className = "error";
+                return;
+            }
+
+            const hash = await hashPassword(pass);
+            existing[email] = {
+                passwordHash: hash,
+                createdAt: new Date().toISOString()
+            };
+            setEmailUsers(existing);
+
+            msg.textContent = "Account created successfully!";
+            msg.className = "success";
+
+            // auto-fill login email
+            document.getElementById('loginEmail').value = email;
+        }
+
+        async function login() {
+            const email = document.getElementById('loginEmail').value.trim().toLowerCase();
+            const pass = document.getElementById('loginPass').value;
+            const msg = document.getElementById('loginMsg');
+
+            msg.textContent = "";
+            msg.className = "";
+
+            const existing = getEmailUsers();
+            const user = existing[email];
+
+            if (!user) {
+                msg.textContent = "No account found with that email.";
+                msg.className = "error";
+                return;
+            }
+
+            const hash = await hashPassword(pass);
+            if (hash !== user.passwordHash) {
+                msg.textContent = "Invalid email or password.";
+                msg.className = "error";
+                return;
+            }
+
+            // store current logged-in email
+            localStorage.setItem(CURRENT_EMAIL_KEY, email);
+
+            msg.textContent = "Login successful! Redirecting...";
+            msg.className = "success";
+            setTimeout(() => {
+                // change this if your main page has a different name
+                window.location.href = "main.html";
+            }, 800);
+        }
+    </script>
+
+</body>
+
+</html>

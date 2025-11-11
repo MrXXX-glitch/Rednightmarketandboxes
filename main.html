@@ -1,0 +1,600 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>RedNight Market — Shop</title>
+<style>
+
+/* full item list frame */
+#itemFrameOverlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.82);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:9999;
+}
+#itemFrame{
+  width:min(900px,90vw);
+  max-height:80vh;
+  background:var(--panel);
+  border-radius:var(--radius);
+  padding:18px;
+  box-shadow:var(--card-shadow);
+  border:1px solid rgba(255,255,255,0.08);
+  display:flex;
+  flex-direction:column;
+}
+.item-page{
+  display:none;
+  margin-top:10px;
+  overflow:auto;
+}
+.item-page.active{
+  display:block;
+}
+.item-page ol{
+  padding-left:18px;
+}
+.page-nav{
+  margin-top:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:8px;
+}
+.page-nav button{
+  padding:6px 12px;
+}
+
+:root{
+  --bg:#070607; --panel:#0f0d0f; --accent1:#ff1f1f; --accent2:#b30000;
+  --muted:#9b9b9b; --card-shadow: 0 6px 30px rgba(0,0,0,0.6); --radius:14px;
+  font-family: "Inter", Roboto, system-ui, -apple-system, "Segoe UI", Arial;
+}
+*{box-sizing:border-box} html,body{height:100%}
+body{
+  margin:0; background: linear-gradient(180deg,#050505 0%, #0c0c0c 40%, #120707 100%);
+  color:#eee; -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; padding:30px;
+}
+.container{max-width:980px;margin:0 auto}
+.header{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:22px}
+.brand{display:flex;align-items:center;gap:12px}
+.logo{height:54px;width:54px;border-radius:10px;background: linear-gradient(135deg,var(--accent1),var(--accent2));
+  display:flex;align-items:center;justify-content:center;font-weight:800;color:white;box-shadow: 0 6px 18px rgba(179,0,0,0.18);font-family:monospace}
+.site-title{font-size:20px;font-weight:700;letter-spacing:0.6px}
+.nav a{color:#f3dcdc;text-decoration:none;margin-left:14px;padding:8px 10px;border-radius:8px}
+.nav a:hover{background:rgba(255,31,31,0.08)}
+.card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));border-radius:var(--radius);padding:18px;box-shadow:var(--card-shadow);border:1px solid rgba(255,255,255,0.03)}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:6px}
+input,textarea,select{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.05);background:transparent;color:#fff;outline:none;font-size:14px}
+input:focus{box-shadow:0 0 0 3px rgba(255,31,31,0.08);border-color:rgba(255,31,31,0.3)}
+.btn{display:inline-block;padding:10px 16px;border-radius:10px;background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white;font-weight:700;border:none;cursor:pointer;box-shadow:0 8px 30px rgba(179,0,0,0.18)}
+.btn.ghost{background:transparent;border:1px solid rgba(255,255,255,0.06);color:#eee}
+.btn:active{transform:translateY(1px)}
+.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;margin-top:14px}
+.product{padding:12px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.04));border:1px solid rgba(255,255,255,0.03)}
+.product .title{font-weight:700;margin:8px 0}
+.product .price{color:var(--accent1);font-weight:800;font-size:18px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;background:rgba(255,31,31,0.12);color:var(--accent1);font-weight:700;font-size:12px;margin-bottom:8px}
+.cart{margin-top:18px;padding:12px;border-radius:10px;background:linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.03));border:1px solid rgba(255,255,255,0.02)}
+.small{font-size:12px;color:var(--muted)} .center{display:flex;align-items:center;justify-content:center}
+.footer{margin-top:28px;color:var(--muted);text-align:center;font-size:13px}
+a.btn{ text-decoration:none }
+
+/* catalog controls */
+.controls{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:10px 0 6px}
+.controls select{background:transparent;color:#fff;border:1px solid rgba(255,255,255,0.15);border-radius:10px;padding:8px}
+.controls label{font-size:12px;color:#9b9b9b}
+
+/* AI chat widget */
+#ai-fab{position:fixed;right:18px;bottom:18px;background:linear-gradient(135deg,#ff1f1f,#b30000);color:#fff;
+  border:none;border-radius:999px;width:56px;height:56px;font-weight:800;cursor:pointer;box-shadow:0 10px 30px rgba(0,0,0,.4)}
+#ai-panel{position:fixed;right:18px;bottom:86px;width:340px;max-height:70vh;background:rgba(255,255,255,0.03);
+  border:1px solid rgba(255,255,255,0.08);backdrop-filter:blur(6px);border-radius:14px;display:none;flex-direction:column;box-shadow:0 18px 40px rgba(0,0,0,.6)}
+#ai-head{padding:10px 12px;border-bottom:1px solid rgba(255,255,255,0.06);display:flex;justify-content:space-between;align-items:center}
+#ai-log{padding:10px;overflow:auto;flex:1;font-size:14px}
+#ai-log .u{background:#141014;border:1px solid rgba(255,255,255,.06);padding:8px;border-radius:10px;margin:6px 0}
+#ai-log .a{background:linear-gradient(180deg,rgba(255,31,31,.09),rgba(0,0,0,.06));border:1px solid rgba(255,31,31,.18);padding:8px;border-radius:10px;margin:6px 0}
+#ai-form{display:flex;gap:8px;padding:10px;border-top:1px solid rgba(255,255,255,0.06)}
+#ai-in{flex:1;background:transparent;border:1px solid rgba(255,255,255,0.08);border-radius:10px;padding:10px;color:#fff}
+#ai-send{background:#ff1f1f;border:none;border-radius:10px;padding:10px 12px;color:#fff;font-weight:700;cursor:pointer}
+#ai-progress{font-size:12px;color:#ccc;padding:6px 10px}
+
+/* product thumbnails */
+.product .thumb{
+  width:100%;
+  aspect-ratio:16/9;
+  object-fit:cover;
+  border-radius:10px;
+  border:1px solid rgba(255,255,255,0.05);
+  background: radial-gradient(120% 120% at 100% 0%, rgba(255,31,31,0.15), rgba(0,0,0,0.1) 40%, transparent 70%);
+  box-shadow: 0 8px 28px rgba(179,0,0,0.15);
+  margin-bottom:10px;
+}
+
+</style>
+</head>
+
+<button id="ai-fab">AI</button>
+<div id="ai-panel">
+  <div id="ai-head">
+    <div style="font-weight:700">RedNight Assistant</div>
+    <button id="ai-close" class="btn ghost" style="padding:6px 10px">×</button>
+  </div>
+  <div id="ai-progress">Loading model… (first time can take a bit)</div>
+  <div id="ai-log"></div>
+  <form id="ai-form">
+    <input id="ai-in" placeholder="Ask about products, orders, or security…" autocomplete="off">
+    <button id="ai-send" type="submit">Send</button>
+  </form>
+</div>
+<script type="module">
+  import { CreateMLCEngine } from "https://esm.run/@mlc-ai/web-llm";
+
+  // UI bits
+  const fab = document.getElementById('ai-fab');
+  const panel = document.getElementById('ai-panel');
+  const closeBtn = document.getElementById('ai-close');
+  const log = document.getElementById('ai-log');
+  const form = document.getElementById('ai-form');
+  const input = document.getElementById('ai-in');
+  const prog = document.getElementById('ai-progress');
+
+  fab.onclick = () => panel.style.display = (panel.style.display === 'flex' ? 'none' : 'flex');
+  closeBtn.onclick = () => panel.style.display = 'none';
+
+  function addBubble(cls, text) {
+    const d = document.createElement('div'); d.className = cls; d.textContent = text; log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+    return d;
+  }
+
+  // Load a small, free model (runs in the browser via WebGPU)
+  let engine;
+  const systemPrompt = "You are RedNight Assistant. Be concise, helpful, and polite. If asked about payments, say checkout is a demo only. Never help with illegal activity.";
+  const messages = [{ role: "system", content: systemPrompt }];
+
+  (async () => {
+    try {
+      engine = await CreateMLCEngine("Llama-3.2-1B-Instruct-q4f32_1-MLC", {
+        initProgressCallback: (p) => prog.textContent = p.text || "Loading…"
+      });
+      prog.textContent = "Ready.";
+    } catch (e) {
+      prog.textContent = "Failed to load AI (this browser may lack WebGPU). Try Chrome/Edge desktop.";
+      console.error(e);
+    }
+  })();
+
+  form.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const q = input.value.trim(); if (!q || !engine) return;
+    input.value = "";
+    addBubble("u", q);
+    const a = addBubble("a", "");
+
+    let answer = "";
+    try {
+      const stream = await engine.chat.completions.create({
+        messages: [...messages, { role: "user", content: q }],
+        stream: true,
+        temperature: 0.7,
+        max_tokens: 256
+      });
+      for await (const chunk of stream) {
+        const delta = chunk.choices?.[0]?.delta?.content ?? "";
+        answer += delta; a.textContent = answer;
+      }
+      messages.push({ role: "user", content: q });
+      messages.push({ role: "assistant", content: answer });
+    } catch (err) {
+      a.textContent = "Sorry, I couldn’t generate a reply.";
+      console.error(err);
+    }
+  });
+</script>
+<script>
+  const menuToggle = document.getElementById('menuToggle');
+  const navMenu = document.getElementById('navMenu');
+
+  menuToggle.addEventListener('click', () => {
+    navMenu.classList.toggle('open');
+  });
+
+  // Optional: close menu when clicking outside
+  document.addEventListener('click', (e) => {
+    if (!navMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+      navMenu.classList.remove('open');
+    }
+  });
+</script>
+
+<body>
+  <div class="wrap">
+    <header class="header">
+      <div class="brand">
+        <div class="logo">RN</div>
+        <div>
+          <div class="site-title">RedNight Market</div>
+          <div class="small">Cybersecurity shop — ethical items only</div>
+        </div>
+      </div>
+      <nav class="nav">
+        <a href="account.html" target="login.html">Account</a>
+        <a href="rank.html" target="login.html">Ranks</a>
+        <a href="chalenge.html" target="login.html">Challenges</a>
+        <a href="leaderboard.html" target="leaderboard.html">Leaderboard</a>
+        <a href="out.html" target="login.html">Sign out</a>
+        <a href="account.html" target="login.html">Account</a>
+        <a href="about.html" target="about.html">About</a>
+        <a href="quiz.html">Quiz's</a>
+        <a href="guides.html">Guides</a>
+        <a href="playground.html">Playground</a>
+        <a href="ctf.html">CTF</a>
+        <a href="shop.html">Shop</a>
+        <a href="#" class="btn ghost" onclick="document.getElementById('cartBox').scrollIntoView({behavior:'smooth'});return false;">Checkout</a>
+      </nav>
+    </header>
+
+    <main class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap">
+        <div>
+          <div class="badge">New</div>
+          <h2 style="margin:6px 0 0 0">Featured security tools & training</h2>
+          <div class="small">Legal, ethical, for your lab only.</div>
+        </div>
+        <div class="center" style="gap:8px">
+          <button class="btn ghost" id="openItemFrameBtn">All items list</button>
+          <button class="btn" onclick="document.getElementById('cartBox').scrollIntoView({behavior:'smooth'})">View
+            Cart</button>
+        </div>
+      </div>
+>
+      </div>
+
+      <div class="controls">
+        <label>Sort:</label>
+        <select id="sortSel">
+          <option value="price_asc">Price ↑</option>
+          <option value="price_desc">Price ↓</option>
+          <option value="title_asc">Title A→Z</option>
+          <option value="title_desc">Title Z→A</option>
+        </select>
+      
+        <button id="applyFilters" class="btn" style="padding:8px 14px;">
+          Apply
+        </button>
+      
+        <label style="margin-left:12px">Price filter:</label>
+        <select id="filterSel">
+          <option value="all">All</option>
+          <option value="lt10">Less than €10</option>
+          <option value="lt20">Less than €20</option>
+          <option value="lt100">Less than €100</option>
+          <option value="gt100">More than €100</option>
+        </select>
+      </div>
+
+
+      <section class="products" id="productList"></section>
+
+      <div class="cart" id="cartBox">
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <div><strong>Cart</strong> <span id="cartCount" class="small">0 items</span></div>
+          <div><strong id="cartTotal">€0.00</strong></div>
+        </div>
+        <div id="cartItems" style="margin-top:10px"></div>
+        <div style="margin-top:12px;display:flex;gap:8px">
+          <button class="btn" onclick="location.href='payment.html'">Simulate purchase</button>
+          <button class="btn ghost" onclick="clearCart()">Clear</button>
+        </div>
+      </div>
+    </main>
+      <!-- Full item list frame with 2 pages -->
+      <div id="itemFrameOverlay">
+        <div id="itemFrame">
+          <div style="display:flex;justify-content:space-between;align-items:center;gap:8px">
+            <div>
+              <div class="badge">Catalog</div>
+              <h3 style="margin:4px 0 0 0">All RedNight Market Items</h3>
+              <div class="small" id="pageLabel">Page 1 of 2</div>
+            </div>
+            <button class="btn ghost" id="closeItemFrame" style="padding:6px 10px">×</button>
+          </div>
+      
+          <div id="itemPage1" class="item-page active"></div>
+          <div id="itemPage2" class="item-page"></div>
+      
+          <div class="page-nav">
+            <button class="btn ghost" id="prevItemPage">← Previous</button>
+            <button class="btn ghost" id="nextItemPage">Next →</button>
+          </div>
+        </div>
+      </div>
+
+    <footer class="footer">
+      <button class="btn ghost" id="backToTopBtn" style="margin-bottom:10px;">
+        Back to top ↑
+      </button><br>
+      This is a demo storefront template. Do not use for illegal goods.
+    </footer>
+
+  </div>
+
+<script>
+/* Inline demo JS (no external files) */
+  const PRODUCTS = [
+    { id: "p1", title: "Practical Pentest Labs (eBook)", price: 29.99, desc: "Hands-on labs for ethical pentesters." },
+    { id: "p2", title: "Ethical Hacking Course (video)", price: 99.00, desc: "Beginner → intermediate course." },
+    { id: "p3", title: "Network Security Fundamentals (book)", price: 34.50, desc: "Core concepts for network defenders." },
+    { id: "p4", title: "Advanced Linux Forensics (book)", price: 39.99, desc: "Forensic techniques on Linux systems." },
+    { id: "p5", title: "Web Application Security (book)", price: 32.00, desc: "OWASP-focused web security guide." },
+    { id: "p6", title: "Wireless Security & WPA3 Guide (book)", price: 27.50, desc: "Secure wireless network practices." },
+    { id: "p7", title: "Cloud Security Fundamentals (course)", price: 79.00, desc: "Cloud hardening & best practices." },
+    { id: "p8", title: "Malware Analysis for Beginners (course)", price: 85.00, desc: "Safe, lab-based malware analysis." },
+    { id: "p9", title: "Digital Forensics Toolkit (eBook + checklist)", price: 24.99, desc: "Practical forensic checklist & tools." },
+    { id: "p10", title: "CTF Challenge Pack (VM images)", price: 19.99, desc: "Vulnerable VMs for CTF practice." },
+    { id: "p11", title: "YubiKey-style FIDO2 Token", price: 49.99, desc: "Hardware key for 2FA & secure logins." },
+    { id: "p12", title: "FIDO2 USB Key Pack (2pcs)", price: 89.00, desc: "Two hardware tokens for backup." },
+    { id: "p13", title: "Hardware Password Manager Device", price: 79.99, desc: "Offline password storage device." },
+    { id: "p14", title: "Security Key Leather Pouch", price: 9.99, desc: "Protective holder for security keys." },
+    { id: "p15", title: "RFID-Blocking Wallet Sleeve", price: 12.99, desc: "Block unwanted RFID reads." },
+    { id: "p16", title: "Encrypted External SSD (1TB)", price: 149.99, desc: "Hardware-encrypted portable storage." },
+    { id: "p17", title: "Tamper-evident Laptop Seals (10pk)", price: 7.50, desc: "Show if a device was opened." },
+    { id: "p18", title: "USB Data Blocker (Charge Only)", price: 6.99, desc: "Prevent data transfer via USB ports." },
+    { id: "p19", title: "Hardware-encrypted USB Flash Drive", price: 34.99, desc: "PIN-protected USB flash drive." },
+    { id: "p20", title: "MicroSD Hardware-encrypted Card (128GB)", price: 39.99, desc: "Encrypted removable storage." },
+    { id: "p21", title: "Raspberry Pi Starter Kit (4GB)", price: 69.99, desc: "Small SBC kit for labs & projects." },
+    { id: "p22", title: "Raspberry Pi PoE HAT", price: 24.99, desc: "Power-over-Ethernet HAT for Pi." },
+    { id: "p23", title: "Orange Pi / SBC Dev Kit", price: 54.99, desc: "Alternative single-board computer kit." },
+    { id: "p24", title: "SBC Wi-Fi Adapter (lab grade)", price: 14.99, desc: "USB Wi-Fi adapter for testing." },
+    { id: "p25", title: "Portable Battery Pack (10000mAh)", price: 22.99, desc: "Power for field lab devices." },
+    { id: "p26", title: "Compact Soldering Kit (iron + tips)", price: 29.99, desc: "For small hardware repairs." },
+    { id: "p27", title: "HDMI to USB Capture Card", price: 34.50, desc: "Capture video output for analysis." },
+    { id: "p28", title: "Electronics Breadboard Starter Kit", price: 19.99, desc: "Wires, sensors, LEDs for prototyping." },
+    { id: "p29", title: "Jumper Wire & Sensor Pack", price: 12.99, desc: "Essentials for hardware experimentation." },
+    { id: "p30", title: "USB Logic Analyzer Beginner Kit", price: 44.99, desc: "Inspect low-level hardware signals." },
+    { id: "p31", title: "Passive Network TAP (lab)", price: 69.99, desc: "Non-intrusive traffic monitoring TAP." },
+    { id: "p32", title: "Managed Gigabit Switch (8-port)", price: 89.99, desc: "VLAN capable managed switch." },
+    { id: "p33", title: "Portable Travel Router (OpenWrt-ready)", price: 49.99, desc: "Small router for isolated networks." },
+    { id: "p34", title: "Wireless Access Point (lab)", price: 59.99, desc: "Testable AP for wireless labs." },
+    { id: "p35", title: "USB Ethernet Multiport Adapter", price: 29.99, desc: "Add multiple NICs to a laptop." },
+    { id: "p36", title: "PoE Injector / Splitter Kit", price: 24.99, desc: "Power network devices over Ethernet." },
+    { id: "p37", title: "Mini NAS for Lab (2-bay, refurb)", price: 129.00, desc: "Small NAS for backups & VM storage." },
+    { id: "p38", title: "Refurbished Firewall Appliance (lab)", price: 159.00, desc: "Enterprise firewall for testing." },
+    { id: "p39", title: "Industrial Protocol Simulator Kit", price: 79.99, desc: "Modbus/SCADA learning hardware kit." },
+    { id: "p40", title: "Portable LTE/5G Hotspot (unlocked)", price: 99.99, desc: "Isolated internet access for labs." },
+    { id: "p41", title: "VPN 1-year Subscription (voucher)", price: 49.99, desc: "Privacy-focused VPN for lab use." },
+    { id: "p42", title: "Encrypted Email Service Voucher", price: 29.99, desc: "Secure email trial subscription." },
+    { id: "p43", title: "Dark-web Monitoring (trial)", price: 59.00, desc: "Brand monitoring for security teams." },
+    { id: "p44", title: "Cloud Backup Subscription (6 months)", price: 39.99, desc: "Offsite backups for lab data." },
+    { id: "p45", title: "Training Platform Credits (TryHackMe)", price: 25.00, desc: "Practice lab & CTF credits." },
+    { id: "p46", title: "EDR Trial License (lab)", price: 49.00, desc: "Endpoint detection trial for tests." },
+    { id: "p47", title: "SIEM Trial Credits (cloud)", price: 99.00, desc: "Small SIEM for lab experimentation." },
+    { id: "p48", title: "SSL Certificate Voucher (DV)", price: 14.99, desc: "Domain-validated certificate for tests." },
+    { id: "p49", title: "Domain Privacy / WHOIS Protection", price: 7.99, desc: "Hide personal info on domain WHOIS." },
+    { id: "p50", title: "Pen-test Consulting Voucher (1hr)", price: 75.00, desc: "One hour of consulting for small tests." },
+    { id: "p51", title: "USB-C Multiport Hub (6-in-1)", price: 29.99, desc: "Convenience hub for laptop labs." },
+    { id: "p52", title: "RJ45 Crimping Tool Set", price: 24.99, desc: "Crimp connectors for custom cables." },
+    { id: "p53", title: "Network Cable Tester (tone/continuity)", price: 19.99, desc: "Verify Ethernet wiring quickly." },
+    { id: "p54", title: "CAT6 Patch Cables Assortment (5pk)", price: 14.99, desc: "Assorted lengths for a small lab." },
+    { id: "p55", title: "Shielded Ethernet Bulk Roll (100m)", price: 64.99, desc: "Bulk cable for lab wiring." },
+    { id: "p56", title: "Label Printer for Network Cables", price: 39.99, desc: "Print neat cable labels for racks." },
+    { id: "p57", title: "Anti-static Wrist Strap & Mat Kit", price: 12.99, desc: "Protect electronics during experiments." },
+    { id: "p58", title: "Electronics Toolkit (mini)", price: 22.99, desc: "Pliers, cutters, precision drivers." },
+    { id: "p59", title: "USB Inspection Camera (endoscope)", price: 29.99, desc: "Inspect small hardware internals." },
+    { id: "p60", title: "Thermal Imaging USB Stick", price: 129.00, desc: "Basic thermal diagnostics for hardware." },
+    { id: "p61", title: "Security-Themed Hoodie (ethical)", price: 34.99, desc: "Comfortable lab-branded hoodie." },
+    { id: "p62", title: "Infographic Poster: Build a Safe Lab", price: 9.99, desc: "Printable homelab setup guide poster." },
+    { id: "p63", title: "Sticker Pack: Cyber Icons (10pcs)", price: 5.99, desc: "Decorative & educational stickers." },
+    { id: "p64", title: "Branded Network Map Mousepad", price: 12.99, desc: "Large mousepad with network art." },
+  ];
+
+
+function fmtEUR(n){return "€"+n.toFixed(2)}
+function cartKey(){return "rn_demo_cart_v1"}
+
+  let currentSort = "price_asc";
+  let currentFilter = "all";
+
+  function updateCatalog() {
+    // filter
+    let list = PRODUCTS.filter(p => {
+      switch (currentFilter) {
+        case "lt10": return p.price < 10;
+        case "lt20": return p.price < 20;
+        case "lt100": return p.price < 100;
+        case "gt100": return p.price > 100;
+        default: return true;
+      }
+    });
+
+    // sort
+    list.sort((a, b) => {
+      switch (currentSort) {
+        case "price_asc": return a.price - b.price;
+        case "price_desc": return b.price - a.price;
+        case "title_asc": return a.title.localeCompare(b.title);
+        case "title_desc": return b.title.localeCompare(a.title);
+      }
+    });
+
+    loadProducts(list); // render
+  }
+
+
+function storageOK(){
+  try {
+    const k="__t"; localStorage.setItem(k,"1"); localStorage.removeItem(k); return true;
+  } catch(e){ return false; }
+}
+
+function getCart(){
+  if(!storageOK()) return [];
+  try { return JSON.parse(localStorage.getItem(cartKey())||"[]") } catch(e){ return [] }
+}
+function setCart(c){
+  if(storageOK()) localStorage.setItem(cartKey(), JSON.stringify(c));
+}
+
+  // Dark cyber-themed images (Unsplash IDs; free to hotlink)
+  // Reliable dark cyber-themed images (Unsplash, free to use)
+    const IMAGE_POOL = [
+      "https://images.unsplash.com/photo-1605902711622-cfb43c4437d2", // hacker with laptop
+      "https://images.unsplash.com/photo-1510511459019-5dda7724fd87", // red neon keyboard
+      "https://images.unsplash.com/photo-1605902711622-834b2bfa8416", // code terminal
+      "https://images.unsplash.com/photo-1544197150-b99a580bb7a8",    // server racks red light
+      "https://images.unsplash.com/photo-1505678261036-a3fcc5e884ee", // abstract digital background
+      "https://images.unsplash.com/photo-1591696205602-2f950c417cb9", // lock symbol dark
+      "https://images.unsplash.com/photo-1504384308090-c894fdcc538d", // red glowing circuits
+      "https://images.unsplash.com/photo-1605902711622-29f15fae94e2", // code blur
+      "https://images.unsplash.com/photo-1605902711702-36b4dcf99bd6", // padlock red light
+      "https://images.unsplash.com/photo-1545239351-1141bd82e8a6"     // fingerprint scanner blue/red
+    ];
+
+
+function loadProducts(list) {
+  const container = document.getElementById("productList");
+  if (!container) return;
+  container.innerHTML = "";
+  const src = list || PRODUCTS;
+
+  src.forEach((p, i) => {
+    const img = IMAGE_POOL[i % IMAGE_POOL.length] + "?auto=format&fit=crop&w=800&q=60";
+    const el = document.createElement("div");
+    el.className = "product";
+    el.innerHTML = `
+    <img class="thumb" src="${img}" alt="${p.title}">
+    <div class="badge">Legal</div>
+    <div class="title">${p.title}</div>
+    <div class="small">${p.desc}</div>
+    <div style="margin-top:8px;display:flex;align-items:center;justify-content:space-between">
+      <div class="price">${fmtEUR(p.price)}</div>
+      <div><button class="btn" onclick='addToCart("${p.id}")'>Add</button></div>
+    </div>`;
+    container.appendChild(el);
+  });
+}
+
+function addToCart(id){
+  const c = getCart(); c.push(id); setCart(c); updateCartUI();
+}
+function removeFromCart(i){
+  const c = getCart(); c.splice(i,1); setCart(c); updateCartUI();
+}
+function clearCart(){
+  if(storageOK()) localStorage.removeItem(cartKey());
+  updateCartUI();
+}
+function updateCartUI(){
+  const items = document.getElementById("cartItems");
+  const count = document.getElementById("cartCount");
+  const total = document.getElementById("cartTotal");
+  if(!items) return;
+
+  const c = getCart();
+  count.innerText = `${c.length} items`;
+  let html = "", sum = 0;
+  c.forEach((id, idx)=>{
+    const p = PRODUCTS.find(x=>x.id===id); if(!p) return;
+    sum += p.price;
+    html += `<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed rgba(255,255,255,0.06)">
+      <div><strong>${p.title}</strong><div class="small">${fmtEUR(p.price)}</div></div>
+      <div><button class="small btn ghost" onclick='removeFromCart(${idx})'>Remove</button></div>
+    </div>`;
+  });
+  items.innerHTML = html || `<div class="small" style="opacity:0.8">Cart is empty</div>`;
+  total.innerText = fmtEUR(sum);
+}
+  function simulatePurchase() {
+    window.location.href = "Payment.html";
+  }
+
+    // ===== Full item list frame with 2 pages =====
+    let currentItemPage = 1;
+    const TOTAL_ITEM_PAGES = 2;
+
+    function buildItemPages() {
+      const page1 = document.getElementById("itemPage1");
+      const page2 = document.getElementById("itemPage2");
+      if (!page1 || !page2) return;
+
+      const mid = Math.ceil(PRODUCTS.length / 2);
+      const part1 = PRODUCTS.slice(0, mid);
+      const part2 = PRODUCTS.slice(mid);
+
+      page1.innerHTML = buildItemListHTML(part1);
+      page2.innerHTML = buildItemListHTML(part2);
+    }
+
+    function buildItemListHTML(list) {
+      return "<ol>" + list.map(p =>
+        `<li><strong>${p.title}</strong> — <span class="small">${fmtEUR(p.price)}</span></li>`
+      ).join("") + "</ol>";
+    }
+
+    function setItemPage(page) {
+      currentItemPage = page;
+      const p1 = document.getElementById("itemPage1");
+      const p2 = document.getElementById("itemPage2");
+      const label = document.getElementById("pageLabel");
+      if (!p1 || !p2 || !label) return;
+
+      p1.classList.toggle("active", page === 1);
+      p2.classList.toggle("active", page === 2);
+      label.textContent = `Page ${page} of ${TOTAL_ITEM_PAGES}`;
+    }
+
+    function openItemFrame() {
+      const overlay = document.getElementById("itemFrameOverlay");
+      if (!overlay) return;
+      overlay.style.display = "flex";
+      setItemPage(1);
+    }
+
+    function closeItemFrame() {
+      const overlay = document.getElementById("itemFrameOverlay");
+      if (!overlay) return;
+      overlay.style.display = "none";
+    }
+      // build 2 pages for the full item list
+    buildItemPages();
+
+    const openBtn = document.getElementById("openItemFrameBtn");
+    const closeBtnFrame = document.getElementById("closeItemFrame");
+    const prevBtn = document.getElementById("prevItemPage");
+    const nextBtn = document.getElementById("nextItemPage");
+
+    if (openBtn) openBtn.addEventListener("click", openItemFrame);
+    if (closeBtnFrame) closeBtnFrame.addEventListener("click", closeItemFrame);
+    if (prevBtn) prevBtn.addEventListener("click", () => {
+      if (currentItemPage > 1) setItemPage(currentItemPage - 1);
+    });
+    if (nextBtn) nextBtn.addEventListener("click", () => {
+      if (currentItemPage < TOTAL_ITEM_PAGES) setItemPage(currentItemPage + 1);
+    });
+
+document.addEventListener("DOMContentLoaded", ()=>{
+  sortSel.addEventListener("change", e => currentSort = e.target.value);
+  filterSel.addEventListener("change", e => currentFilter = e.target.value);
+  const backBtn = document.getElementById("backToTopBtn");
+  if (backBtn) {
+    backBtn.addEventListener("click", () => {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  }
+
+  const applyBtn = document.getElementById("applyFilters");
+  applyBtn.addEventListener("click", () => updateCatalog());
+
+  updateCatalog(); // initial render
+
+  updateCartUI();
+
+});
+</script>
+</body>
+</html>

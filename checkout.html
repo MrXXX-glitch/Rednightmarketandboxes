@@ -1,0 +1,420 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>RedNight — Checkout</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        /* Light theme overrides */
+        body {
+            margin: 0;
+            font-family: "Inter", system-ui, sans-serif;
+            background: #eef3fb;
+            color: #222;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            padding: 24px 16px 40px;
+        }
+
+        header.header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: linear-gradient(90deg, #007bff, #00b4d8);
+            color: #fff;
+            padding: 12px 18px;
+            border-radius: 10px;
+            margin-bottom: 24px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            height: 50px;
+            width: 50px;
+            border-radius: 12px;
+            background: #fff;
+            color: #007bff;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+            font-family: monospace;
+        }
+
+        .site-title {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        nav.nav a {
+            color: #fff;
+            text-decoration: none;
+            margin-left: 14px;
+            font-weight: 500;
+            transition: opacity 0.2s, background 0.2s;
+            padding: 6px 10px;
+            border-radius: 999px;
+        }
+
+        nav.nav a:hover {
+            opacity: 0.9;
+            background: rgba(0, 0, 0, 0.15);
+        }
+
+        main {
+            display: grid;
+            grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr);
+            gap: 18px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 12px;
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.06);
+            padding: 20px 18px;
+        }
+
+        h2 {
+            color: #007bff;
+            margin-top: 0;
+            margin-bottom: 10px;
+        }
+
+        .section-sub {
+            font-size: 13px;
+            color: #555;
+            margin-bottom: 14px;
+        }
+
+        /* Order summary */
+        .summary-list {
+            max-height: 260px;
+            overflow-y: auto;
+            border-radius: 8px;
+            border: 1px solid #e2e6f0;
+            background: #f9fbff;
+            padding: 8px 10px;
+        }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 8px 2px;
+            border-bottom: 1px solid #e1e5f0;
+            font-size: 14px;
+        }
+
+        .summary-item:last-child {
+            border-bottom: none;
+        }
+
+        .item-title {
+            font-weight: 600;
+        }
+
+        .item-price {
+            color: #007bff;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+
+        .summary-empty {
+            font-size: 13px;
+            color: #777;
+            padding: 6px 0;
+        }
+
+        .total-line {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 15px;
+        }
+
+        .total-line strong {
+            font-size: 18px;
+            color: #007bff;
+        }
+
+        /* Billing form */
+        form#paymentForm {
+            display: grid;
+            gap: 10px;
+        }
+
+        label {
+            font-size: 13px;
+            color: #444;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        input,
+        select {
+            width: 100%;
+            padding: 9px 10px;
+            border-radius: 8px;
+            border: 1px solid #ccd5e4;
+            font-size: 14px;
+            outline: none;
+            transition: border 0.15s, box-shadow 0.15s, background 0.15s;
+            background: #fdfdff;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.24);
+            background: #fff;
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .btn {
+            background: #007bff;
+            color: #fff;
+            border: none;
+            padding: 10px 16px;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 8px;
+            box-shadow: 0 4px 14px rgba(0, 123, 255, 0.35);
+        }
+
+        .btn:hover {
+            background: #0056d2;
+        }
+
+        .note {
+            font-size: 12px;
+            color: #777;
+            margin-top: 6px;
+        }
+
+        #statusMsg {
+            margin-top: 10px;
+            font-size: 13px;
+        }
+
+        #statusMsg.ok {
+            color: #1c7c2d;
+        }
+
+        #statusMsg.err {
+            color: #c0392b;
+        }
+
+        footer.footer {
+            text-align: center;
+            font-size: 13px;
+            color: #555;
+            margin-top: 28px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="brand">
+                <div class="logo">RN</div>
+                <div>
+                    <div class="site-title">RedNight Market</div>
+                    <div style="font-size:13px;">Secure Checkout (Demo)</div>
+                </div>
+            </div>
+            <nav class="nav">
+                <a href="index.html">Home</a>
+                <a href="shop.html">Shop</a>
+                <a href="about.html">About</a>
+                <a href="login.html">Login / Register</a>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Billing / payment details -->
+            <section class="card">
+                <h2>Billing Information</h2>
+                <div class="section-sub">This is a demo only — do not enter real card details.</div>
+                <form id="paymentForm">
+                    <div>
+                        <label for="fullName">Full Name</label>
+                        <input id="fullName" placeholder="Alex Cyber" required>
+                    </div>
+                    <div>
+                        <label for="email">Email</label>
+                        <input id="email" placeholder="you@example.com" type="email" required>
+                    </div>
+                    <div>
+                        <label for="country">Country</label>
+                        <select id="country" required>
+                            <option value="">Select country…</option>
+                            <option>Belgium</option>
+                            <option>Netherlands</option>
+                            <option>Germany</option>
+                            <option>France</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label for="cardNumber">Card Number</label>
+                        <input id="cardNumber" placeholder="1234 5678 9012 3456" required>
+                    </div>
+                    <div class="row-2">
+                        <div>
+                            <label for="exp">Expiry (MM/YY)</label>
+                            <input id="exp" placeholder="09/27" required>
+                        </div>
+                        <div>
+                            <label for="cvc">CVC</label>
+                            <input id="cvc" placeholder="123" required>
+                        </div>
+                    </div>
+
+                    <button class="btn" type="submit">Simulate Payment</button>
+                    <div class="note">No real payment is processed. Cart and details stay in your browser only.</div>
+                    <div id="statusMsg"></div>
+                </form>
+            </section>
+
+            <!-- Order summary -->
+            <section class="card">
+                <h2>Order Summary</h2>
+                <div class="section-sub">Items currently in your cart.</div>
+                <div id="checkoutItems" class="summary-list">
+                    <!-- filled by JS -->
+                </div>
+                <div class="total-line">
+                    <span>Total:</span>
+                    <strong id="checkoutTotal">€0.00</strong>
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            This is a demo checkout page. To accept real payments, integrate a payment provider like Stripe or PayPal on
+            a secure backend.
+        </footer>
+    </div>
+
+    <script>
+        // --- Minimal PRODUCTS map (id → title, price) ---
+        // Replace this with your FULL list from index.html if you want 1:1 match.
+        const PRODUCTS = [
+            { id: "p1", title: "Practical Pentest Labs (eBook)", price: 29.99 },
+            { id: "p2", title: "Ethical Hacking Course (video)", price: 99.00 },
+            { id: "p3", title: "Network Security Fundamentals (book)", price: 34.50 },
+            // ... paste the rest of your PRODUCTS from index.html here ...
+            { id: "p100", title: "RedNight Gift Card / Store Credit", price: 25.00 }
+        ];
+
+        const CART_KEY = "rn_demo_cart_v1";
+
+        function fmtEUR(n) {
+            return "€" + n.toFixed(2);
+        }
+
+        function getCart() {
+            try {
+                return JSON.parse(localStorage.getItem(CART_KEY) || "[]");
+            } catch (e) {
+                return [];
+            }
+        }
+
+        function buildSummary() {
+            const container = document.getElementById("checkoutItems");
+            const totalEl = document.getElementById("checkoutTotal");
+            const cart = getCart();
+
+            container.innerHTML = "";
+
+            if (!cart.length) {
+                container.innerHTML = '<div class="summary-empty">Your cart is empty. Go back to the shop to add items.</div>';
+                totalEl.textContent = fmtEUR(0);
+                return;
+            }
+
+            let total = 0;
+            cart.forEach(id => {
+                const p = PRODUCTS.find(x => x.id === id);
+                if (!p) return;
+                total += p.price;
+
+                const row = document.createElement("div");
+                row.className = "summary-item";
+                row.innerHTML = `
+          <div>
+            <div class="item-title">${p.title}</div>
+          </div>
+          <div class="item-price">${fmtEUR(p.price)}</div>
+        `;
+                container.appendChild(row);
+            });
+
+            totalEl.textContent = fmtEUR(total);
+        }
+
+        function simulatePaymentFlow() {
+            const form = document.getElementById("paymentForm");
+            const statusMsg = document.getElementById("statusMsg");
+
+            form.addEventListener("submit", (e) => {
+                e.preventDefault();
+
+                const cart = getCart();
+                if (!cart.length) {
+                    statusMsg.textContent = "Your cart is empty. Please add items before checking out.";
+                    statusMsg.className = "err";
+                    return;
+                }
+
+                // Very basic front-end validation demo
+                const name = document.getElementById("fullName").value.trim();
+                const email = document.getElementById("email").value.trim();
+                const card = document.getElementById("cardNumber").value.trim();
+
+                if (!name || !email || !card) {
+                    statusMsg.textContent = "Please fill out all required fields.";
+                    statusMsg.className = "err";
+                    return;
+                }
+
+                // Demo: pretend the payment worked
+                statusMsg.textContent = "Payment simulated successfully! Thank you for your order. (No real charge was made.)";
+                statusMsg.className = "ok";
+
+                // Clear cart in this browser
+                localStorage.removeItem(CART_KEY);
+
+                // Refresh the summary after a short delay
+                setTimeout(buildSummary, 600);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", () => {
+            buildSummary();
+            simulatePaymentFlow();
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,302 @@
+/* styles.css - dark ominous theme */
+:root {
+    --bg: #070607;
+    --panel: #0f0d0f;
+    --accent1: #ff1f1f;
+    --accent2: #b30000;
+    --muted: #9b9b9b;
+    --glass: rgba(255, 255, 255, 0.03);
+    --card-shadow: 0 6px 30px rgba(0, 0, 0, 0.6);
+    --radius: 14px;
+    font-family: "Inter", Roboto, system-ui, -apple-system, "Segoe UI", Arial;
+}
+
+* {
+    box-sizing: border-box
+}
+
+html,
+body {
+    height: 100%
+}
+
+body {
+    margin: 0;
+    background: linear-gradient(180deg, #050505 0%, #0b0b0b 40%, #120707 100%);
+    color: #eee;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding: 30px;
+}
+
+/* common container */
+.container {
+    max-width: 980px;
+    margin: 0 auto;
+}
+
+/* header */
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 22px;
+}
+
+.brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    height: 54px;
+    width: 54px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, var(--accent1), var(--accent2));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: white;
+    box-shadow: 0 6px 18px rgba(179, 0, 0, 0.18);
+    font-family: monospace;
+}
+
+.site-title {
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.6px
+}
+
+.nav a {
+    color: #f3dcdc;
+    text-decoration: none;
+    margin-left: 14px;
+    padding: 8px 10px;
+    border-radius: 8px;
+}
+
+.nav a:hover {
+    background: rgba(255, 31, 31, 0.08)
+}
+
+/* card */
+.card {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.06));
+    border-radius: var(--radius);
+    padding: 18px;
+    box-shadow: var(--card-shadow);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+}
+
+/* login grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.form-grid .full {
+    grid-column: 1/-1
+}
+
+/* inputs */
+label {
+    display: block;
+    font-size: 12px;
+    color: var(--muted);
+    margin-bottom: 6px
+}
+
+input,
+textarea,
+select {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    background: transparent;
+    color: #fff;
+    outline: none;
+    font-size: 14px;
+}
+
+input:focus {
+    box-shadow: 0 0 0 3px rgba(255, 31, 31, 0.08);
+    border-color: rgba(255, 31, 31, 0.3)
+}
+
+/* buttons */
+.btn {
+    display: inline-block;
+    padding: 10px 16px;
+    border-radius: 10px;
+    background: linear-gradient(90deg, var(--accent1), var(--accent2));
+    color: white;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(179, 0, 0, 0.18)
+}
+
+.btn.ghost {
+    background: transparent;
+    border: 1px solid rgba(255, 255, 255, 0.06)
+}
+
+.btn:active {
+    transform: translateY(1px)
+}
+
+/* product grid */
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 14px;
+    margin-top: 14px
+}
+
+.product {
+    padding: 12px;
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(0, 0, 0, 0.04));
+    border: 1px solid rgba(255, 255, 255, 0.03)
+}
+
+.product .title {
+    font-weight: 700;
+    margin: 8px 0
+}
+
+.product .price {
+    color: var(--accent1);
+    font-weight: 800;
+    font-size: 18px
+}
+
+.badge {
+    display: inline-block;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: rgba(255, 31, 31, 0.12);
+    color: var(--accent1);
+    font-weight: 700;
+    font-size: 12px;
+    margin-bottom: 8px
+}
+
+/* cart summary */
+.cart {
+    margin-top: 18px;
+    padding: 12px;
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.01), rgba(0, 0, 0, 0.03));
+    border: 1px solid rgba(255, 255, 255, 0.02)
+}
+
+/* checkout */
+.warning {
+    background: linear-gradient(90deg, rgba(179, 0, 0, 0.08), rgba(255, 31, 31, 0.04));
+    border-left: 4px solid var(--accent1);
+    padding: 12px;
+    border-radius: 8px;
+    color: #ffdede;
+    margin-bottom: 12px;
+}
+
+/* small */
+.small {
+    font-size: 12px;
+    color: var(--muted)
+}
+
+.center {
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.footer {
+    margin-top: 28px;
+    color: var(--muted);
+    text-align: center;
+    font-size: 13px
+}
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: linear-gradient(90deg, #9c27ff, #ff00d4);
+    /* change if needed */
+    padding: 10px 16px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.4);
+    position: relative;
+    /* so dropdown can anchor to it */
+}
+
+.logo {
+    font-weight: 800;
+    font-size: 18px;
+    color: #fff;
+}
+
+/* Hamburger button */
+.menu-toggle {
+    background: transparent;
+    border: none;
+    color: #fff;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 6px;
+}
+
+.menu-toggle:hover {
+    background: rgba(255, 255, 255, 0.12);
+}
+
+/* Dropdown menu */
+.nav-menu {
+    position: absolute;
+    top: 100%;
+    right: 10px;
+    margin-top: 8px;
+    background: rgba(10, 0, 30, 0.98);
+    border-radius: 10px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.7);
+    padding: 10px 0;
+    min-width: 180px;
+    display: none;
+    /* hidden by default */
+    flex-direction: column;
+    z-index: 1000;
+}
+
+.nav-menu a {
+    color: #f3e8ff;
+    text-decoration: none;
+    padding: 8px 16px;
+    font-size: 14px;
+    display: block;
+}
+
+.nav-menu a:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+/* When menu is open */
+.nav-menu.open {
+    display: flex;
+}
+
+/* Optional: on very small screens make header full width */
+@media (max-width: 600px) {
+    .header {
+        border-radius: 0;
+        margin-bottom: 16px;
+    }
+}
