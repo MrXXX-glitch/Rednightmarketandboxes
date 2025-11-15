@@ -65,6 +65,23 @@ body{
 .logo{height:54px;width:54px;border-radius:10px;background: linear-gradient(135deg,var(--accent1),var(--accent2));
   display:flex;align-items:center;justify-content:center;font-weight:800;color:white;box-shadow: 0 6px 18px rgba(179,0,0,0.18);font-family:monospace}
 .site-title{font-size:20px;font-weight:700;letter-spacing:0.6px}
+.nav {
+  display: none;
+  flex-direction: column;
+  position: absolute;
+  top: 80px;
+  right: 20px;
+  background: var(--panel);
+  border-radius: var(--radius);
+  padding: 10px;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(255,255,255,0.08);
+}
+
+.nav.open {
+  display: flex;
+}
+
 .nav a{color:#f3dcdc;text-decoration:none;margin-left:14px;padding:8px 10px;border-radius:8px}
 .nav a:hover{background:rgba(255,31,31,0.08)}
 .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.06));border-radius:var(--radius);padding:18px;box-shadow:var(--card-shadow);border:1px solid rgba(255,255,255,0.03)}
@@ -162,27 +179,8 @@ a.btn{ text-decoration:none }
 .hamburger-inner::after {
   bottom: -10px;
 }
-@media (max-width: 768px) {
-  .nav {
-    display: none;
-    flex-direction: column;
-    position: absolute;
-    top: 80px;
-    right: 20px;
-    background: var(--panel);
-    border-radius: var(--radius);
-    padding: 10px;
-    box-shadow: var(--card-shadow);
-    border: 1px solid rgba(255,255,255,0.08);
-  }
-
-  .nav.open {
-    display: flex;
-  }
-
-  .hamburger {
-    display: block;
-  }
+.hamburger {
+  display: block;
 }
 </style>
 </head>
